@@ -7,82 +7,45 @@
     <title>Document</title>
 </head>
 <body>
-    <canvas id="canvas" width="600" height="700"></canvas>
+    <canvas id="canvas" width="800" height="700"></canvas>
     <script>
         window.onload = function(){
             let ctx = document.querySelector("#canvas").getContext("2d")
-            function drawWater(){
-                let waterBlock = new Image()
-                // console.log("inside grass function")
-                waterBlock.src = "images/water-block.png"
-                waterBlock.onload = function(){
-                    for(let i=0; i<5; i++){
-                        console.log("inside grass function loop")
-                        ctx.drawImage(waterBlock, i*101, 0)
+            let resourceUrls = ["water-block.png","stone-block.png",
+                                "grass-block.png","Key.png","Heart.png",
+                                "enemy-bug.png","char-boy.png"]
+            let resources = resourceUrls.map(url=>({
+                url,loaded:false, obj:null
+            }))
+            
+            function loadResources(){
+                resources.forEach(resource =>{
+                    let src = "images/"+resource.url
+                    let img = new Image()
+                    img.src = src
+                    img.onload = function(){
+                        resource.loaded = true 
+                        resource.obj = img
                     }
-                    drawStone()
-                }
-                
-            }
-            function drawGrass(){
-                let grassBlock = new Image()
-                console.log("inside grass function")
-                grassBlock.src = "images/grass-block.png"
-                grassBlock.onload = function(){
-                    for(let i=0; i<5; i++){
-                        console.log("inside grass function loop")
-                        ctx.drawImage(grassBlock, i*101, 0)
-                    }
-                    drawStone()
-                }
-                
+                })
             }
 
-            function drawStone(){
-                let stoneBlock = new Image()
-                stoneBlock.src = "images/stone-block.png"
-                stoneBlock.onload = function(){
-                    for(let i=0; i<5; i++){
-                        ctx.drawImage(stoneBlock, i*101, 85)
-                    }
-                    drawStone2()
-                }
+            function init(){
+                resources.forEach((resource,index) => {
+                    ctx.drawImage(resource.obj, index*101, 10)
+                })
             }
-
-            function drawStone2(){
-                let stoneBlock = new Image()
-                stoneBlock.src = "images/stone-block.png"
-                stoneBlock.onload = function(){
-                    for(let i=0; i<5; i++){
-                        ctx.drawImage(stoneBlock, i*101, 170)
-                    }
-                    drawStone3()
-                }
+            function poll(){
+                let fullyLoaded = resources.every(resource=>resource.loaded)
+                console.log("polling")
+                if(!fullyLoaded)
+                    setTimeout(poll,100)
+                else
+                    init()
             }
-
-            function drawStone3(toAdd=0){
-                let stoneBlock = new Image()
-                stoneBlock.src = "images/stone-block.png"
-                stoneBlock.onload = function(){
-                    for(let i=0; i<5; i++){
-                        ctx.drawImage(stoneBlock, i*101, 255)
-                    }
-                }
-            }
-            drawGrass()
-            console.log("outside grass function")
-
-            // drawStone()
-            // drawStone(85)
-            // drawStone(170)
-
-            // let bugImage = new Image()
-            // bugImage.src = "images/enemy-bug.png"
-            // bugImage.onload = function(){
-            //     ctx.drawImage(bugImage,100,100)
-            //     ctx.drawImage(bugImage,200,100)
-
-            // }
+            loadResources()
+            setTimeout(poll, 100)
+            
         }
     </script>
 </body>
