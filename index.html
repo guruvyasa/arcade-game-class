@@ -10,6 +10,11 @@
     <canvas id="canvas" width="800" height="700"></canvas>
     <script>
         window.onload = function(){
+            let rows=6,cols=5;
+            let blockWidth = 101;
+            let blockHeight = 171;
+            let interBlockHeight = 85;
+            let characters = []
             let ctx = document.querySelector("#canvas").getContext("2d")
             let resourceUrls = ["water-block.png","stone-block.png",
                                 "grass-block.png","Key.png","Heart.png",
@@ -17,6 +22,22 @@
             let resources = resourceUrls.map(url=>({
                 url,loaded:false, obj:null
             }))
+            
+            function makeCharacter({name, x, y}){
+                let [resourceObj] = resources.filter(resource => resource.url.includes(name))
+                // console.log(obj)
+                return {
+                    name,
+                    pos:{x,y},
+                    draw(){
+                        ctx.drawImage(resourceObj.obj,x,y)
+                    }
+                }
+            }
+
+            
+
+            
             
             function loadResources(){
                 resources.forEach(resource =>{
@@ -30,10 +51,39 @@
                 })
             }
 
+            // function drawWater(){
+            //     for(let i=0; i<cols; i++){
+            //         ctx.drawImage()
+            //     }
+            // }
+            let offset = 0;
+
             function init(){
-                resources.forEach((resource,index) => {
-                    ctx.drawImage(resource.obj, index*101, 10)
-                })
+                let offset = 0
+                //create water blocks
+                for(let i=0; i<cols; i++){
+                    characters.push(makeCharacter({name:"water",x:i*blockWidth, y:0}))
+                }
+                offset += interBlockHeight
+                //create stone blocks
+                for(let i=0; i<3; i++){
+                    for(let j=0; j<cols; j++){
+                        characters.push(makeCharacter({name:"stone",x:j*blockWidth, y:offset}))
+                    }
+                    offset += interBlockHeight
+                }
+
+                //create grass blocks
+                for(let i=0; i<cols; i++){
+                    characters.push(makeCharacter({name:"grass",x:i*blockWidth, y:offset}))
+                }
+                console.log(characters)
+
+                characters.forEach(c => c.draw())
+
+                // resources.forEach((resource,index) => {
+                //     ctx.drawImage(resource.obj, index*101, 10)
+                // })
             }
             function poll(){
                 let fullyLoaded = resources.every(resource=>resource.loaded)
